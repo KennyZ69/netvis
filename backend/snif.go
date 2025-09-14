@@ -9,7 +9,9 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
-func Snif(ctx context.Context, filter string, stream *UDPStream) error {
+// func Snif(ctx context.Context, filter string, stream *UDPStream) error {
+// Snif for network packets and handle decoded packets using own handler func;
+func Snif(ctx context.Context, filter string, handler func(p PacketInfo)) error {
 	ifi, err := hdisc.LocalIface()
 	if err != nil {
 		return fmt.Errorf("Error getting local ifi: %v\n", err)
@@ -37,9 +39,7 @@ func Snif(ctx context.Context, filter string, stream *UDPStream) error {
 				continue
 			}
 			data := decodePacket(p)
-			if err := stream.SendPacket(data); err != nil {
-				return err
-			}
+			handler(data)
 		}
 	}
 }

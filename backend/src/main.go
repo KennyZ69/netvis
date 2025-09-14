@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -14,27 +14,37 @@ import (
 
 func main() {
 	filter := flag.String("f", "", "BPF filter (optional)")
-	target := flag.String("t", "", "Target address to connect to")
+	port := flag.Int("p", 999, "Target port to serve on")
 	flag.Parse()
+
+	serv, err := netvis.NewUDPServer(*port)
+	if err != nil {
+		log.Fatalf("Error creating the backend server: %v\n", err)
+	}
+	defer serv.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// handling exit
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigc
+		serv.Close()
 		cancel()
+		os.Exit(0)
 	}()
 
-	s, err := netvis.NewUDPStream(*target)
-	if err != nil {
-		log.Fatal(err)
+	if err = serv.WaitForClient(); err != nil {
+		serv.Close()
+		log.Fatalf("Error getting client connection: %v\n", err)
 	}
-	defer s.Close()
 
-	if err := netvis.Snif(ctx, *filter, s); err != nil {
-		log.Fatal(err)
+	if err := netvis.Snif(ctx, *filter, func(p netvis.PacketInfo) {
+		if err := serv.SendPacket(p); err != nil {
+			fmt.Printf("sending error: %s\n", err)
+		}
+	}); err != nil {
+		fmt.Printf("sniffing error: %s\n", err)
 	}
 }
