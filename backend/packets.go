@@ -17,14 +17,14 @@ type NetEvent struct {
 
 type PacketInfo struct {
 	Timestamp  time.Time `json:"timestamp"`
-	SrcIP      string    `json:"src_ip,omitempty"`
+	SrcIP      string    `json:"src_ip,omitempty"` // 1
 	SrcMAC     string    `json:"src_mac,omitempty"`
-	DestIP     string    `json:"dest_ip,omitempty"`
+	DestIP     string    `json:"dest_ip,omitempty"` // 2
 	DestMAC    string    `json:"dest_mac,omitempty"`
-	Len        int       `json:"len"`
-	Prot       string    `json:"prot,omitempty"`
-	SrcPort    uint16    `json:"src_port,omitempty"`
-	DestPort   uint16    `json:"dest_port,omitempty"`
+	SrcPort    uint16    `json:"src_port,omitempty"`  // 3
+	DestPort   uint16    `json:"dest_port,omitempty"` // 4
+	Len        int       `json:"len"`                 // 5
+	Prot       string    `json:"prot,omitempty"`      // 6
 	Payload    []byte    `json:"payload"`
 	PayloadLen int       `json:"payload_len"`
 }
