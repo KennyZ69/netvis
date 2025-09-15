@@ -39,11 +39,11 @@ int main(int argc, char *argv[]) {
 		int stat = receive_from_serv(sockfd, &p);
 		if (stat == 0) {
 			printf("Received a packet:\n%s:%d -> %s:%d | %s | len=%d\n", p.src_ip, p.src_port, p.dst_ip, p.dst_port, p.prot, p.len);
-		} else if (stat == 1) {
+		} else if (stat == -1) {
 			printf("The server shut down...\n");
 			break;
 		} else {
-			fprintf(stderr, "Error receiving a packet\n");
+			// fprintf(stderr, "Error receiving a packet\n");
 			// break;
 		}
 	}

@@ -37,7 +37,7 @@ int init_client(const char *addr, int port) {
 int receive_from_serv(int sockfd, Packet *p) {
 	char buf[2048];
 	socklen_t len = sizeof(addr_in);
-	int n = recvfrom(sockfd, buf, 2048 - 1, 0, (struct sockaddr*)&addr_in, &len);
+	int n = recvfrom(sockfd, &buf, 2048 - 1, 0, (struct sockaddr*)&addr_in, &len);
 
 	if (n < 0) {
 		return -1;
@@ -46,11 +46,11 @@ int receive_from_serv(int sockfd, Packet *p) {
 
 	n = parse_packet(buf, p);
 	if (n == -1) {
-		fprintf(stderr, "Error receiving a packet: server shutdown\n");
+		// fprintf(stderr, "Error receiving a packet: server shutdown\n");
 		return -1;
-	} else if (n == 0) {
-		fprintf(stderr, "Error parsing the packet json\n");
-		return -1;
+	} else if (n == 1) {
+		// fprintf(stderr, "Error parsing the packet json\n");
+		return 1;
 	}
 
 	return 0;
